@@ -1,9 +1,12 @@
 package com.campus.controller.admin;
 
+import com.campus.Result.PageResult;
 import com.campus.Result.Result;
 import com.campus.constant.JwtClaimsConstant;
 import com.campus.dto.AdminLoginDto;
+import com.campus.dto.StaffPageListDto;
 import com.campus.entity.Admin;
+import com.campus.entity.Staff;
 import com.campus.properties.JwtProperties;
 import com.campus.service.AdminService;
 import com.campus.utils.JwtUtil;
@@ -41,5 +44,11 @@ public class AdminController {
                 .token(token)
                 .build();
       return Result.success(employeeLoginVO);
+    }
+    @GetMapping("staff/page")
+    public Result listStaff(StaffPageListDto staffPageListDto)
+    {
+        PageResult<Staff> pageStaffList = adminservice.listStaff(staffPageListDto);
+        return Result.success(pageStaffList);
     }
 }

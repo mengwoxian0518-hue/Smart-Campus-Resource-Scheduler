@@ -39,8 +39,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void addStaff(Staff staff) {
-        staff.setCreateTime(LocalDateTime.now());
-        staff.setUpdateTime(LocalDateTime.now());
         adminMapper.addStaff(staff);
     }
 
@@ -56,7 +54,6 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void update(Staff staff) {
-        staff.setUpdateTime(LocalDateTime.now());
         adminMapper.update(staff);
     }
 }

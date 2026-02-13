@@ -51,4 +51,27 @@ public class AdminController {
         PageResult<Staff> pageStaffList = adminservice.listStaff(staffPageListDto);
         return Result.success(pageStaffList);
     }
+    @PostMapping("staff")
+    public Result<Staff> addStaff(@RequestBody Staff staff)
+    {adminservice.addStaff(staff);
+        return Result.success() ;
+    }
+    @DeleteMapping("staff/{id}")
+    public Result deleteStaff(@PathVariable Long id)
+    {
+        adminservice.deleteStaff(id);
+        return Result.success();
+    }
+    @GetMapping("staff/{id}")
+    public Result<Staff> getStaffById(@PathVariable Long id)
+    {
+        Staff staff = adminservice.getStaffById(id);
+        return Result.success(staff);
+    }
+    @PostMapping("staff/update")
+    public Result update(@RequestBody Staff staff)
+    {
+        adminservice.update(staff);
+        return Result.success();
+    }
 }

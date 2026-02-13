@@ -10,4 +10,12 @@ public interface AdminService {
     Admin login(AdminLoginDto adminLoginDto);
 
     PageResult<Staff> listStaff(StaffPageListDto staffPageListDto);
+
+    void addStaff(Staff staff);
+
+    void deleteStaff(Long id);
+
+    Staff getStaffById(Long id);
+
+    void update(Staff staff);
 }

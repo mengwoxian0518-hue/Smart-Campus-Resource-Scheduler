@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -34,5 +35,28 @@ public class AdminServiceImpl implements AdminService {
         List<Staff> staff = adminMapper.listStaff(staffPageListDto);
         PageResult<Staff> pageStaffList = new PageResult<Staff>(page.getTotal(), page.getResult());
         return pageStaffList;
+    }
+
+    @Override
+    public void addStaff(Staff staff) {
+        staff.setCreateTime(LocalDateTime.now());
+        staff.setUpdateTime(LocalDateTime.now());
+        adminMapper.addStaff(staff);
+    }
+
+    @Override
+    public void deleteStaff(Long id) {
+        adminMapper.deleteById(id);
+    }
+
+    @Override
+    public Staff getStaffById(Long id) {
+        return adminMapper.getStaffById(id);
+    }
+
+    @Override
+    public void update(Staff staff) {
+        staff.setUpdateTime(LocalDateTime.now());
+        adminMapper.update(staff);
     }
 }

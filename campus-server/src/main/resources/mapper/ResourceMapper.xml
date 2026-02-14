@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.campus.mapper.ResourceMapper">
+    <select id="pageList" resultType="com.campus.vo.ResourceVO">
+        select
+        r.*,
+        c.name as category_name,   <!-- 关联获取类别名 -->
+        f.name as facility_name    <!-- 关联获取场所名 -->
+        from resource r
+        left join category c on r.category_id = c.id
+        left join facility f on r.facility_id = f.id
+        <where>
+            <if test="name != null and name != ''">
+                and r.name like concat('%', #{name}, '%')
+            </if>
+            <if test="categoryId != null">
+                and r.category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and r.status = #{status}
+            </if>
+            <if test="minPrice != null">
+                and r.credit_cost &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                and r.credit_cost &lt;= #{maxPrice}
+            </if>
+        </where>
+        order by r.create_time desc
+    </select>
+    <delete id="delete">
+        <foreach collection="id" item="i">
+            delete from resource where id = #{i}
+        </foreach>
+    </delete>
+</mapper>

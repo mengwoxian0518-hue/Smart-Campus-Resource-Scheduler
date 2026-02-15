@@ -74,4 +74,10 @@ public class AdminController {
         adminservice.update(staff);
         return Result.success();
     }
+    @PostMapping("staff/status/{status}")
+    public Result startOrStop(@PathVariable Integer status,Long id)
+    {
+        adminservice.startOrStop(status,id);
+        return Result.success();
+    }
 }

@@ -56,4 +56,9 @@ public class AdminServiceImpl implements AdminService {
     public void update(Staff staff) {
         adminMapper.update(staff);
     }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        adminMapper.startOrStop(status,id);
+    }
 }

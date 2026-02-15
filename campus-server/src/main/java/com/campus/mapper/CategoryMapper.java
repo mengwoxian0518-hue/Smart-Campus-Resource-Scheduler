@@ -10,4 +10,6 @@ import java.util.List;
 public interface CategoryMapper {
     @Select("select * from category where type=1")
     List<Category> list();
+    @Select("select * from category where type=2")
+    List<Category> listFacility();
 }

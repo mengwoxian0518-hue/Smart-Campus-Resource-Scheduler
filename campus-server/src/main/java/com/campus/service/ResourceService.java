@@ -19,4 +19,6 @@ public interface ResourceService {
     Resource getById(Long id);
 
     void startOrStop(Integer status, Long id);
+
+    List<Resource> list(Long id);
 }

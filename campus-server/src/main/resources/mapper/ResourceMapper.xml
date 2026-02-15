@@ -34,4 +34,7 @@
             delete from resource where id = #{i}
         </foreach>
     </delete>
+    <select id="list" resultType="Resource">
+        select * from resource where facility_id = #{id}
+    </select>
 </mapper>

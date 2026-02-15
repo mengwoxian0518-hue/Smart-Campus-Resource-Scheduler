@@ -21,13 +21,18 @@ import java.util.Objects;
 public class ResourceController {
     @Autowired
     ResourceService resourceService;
-    @GetMapping("/list")
+    @GetMapping("/page")
     public Result<PageResult<ResourceVO>> resourcePageList(ResourcePageQueryDTO resourcePageQueryDTO) {
         if(Objects.equals(resourcePageQueryDTO.getMaxPrice(), new BigDecimal(0))){
             resourcePageQueryDTO.setMaxPrice(new BigDecimal(Integer.MAX_VALUE));
         }
         PageResult<ResourceVO> resourceVOPageResult = resourceService.pageList(resourcePageQueryDTO);
         return Result.success(resourceVOPageResult);
+    }
+    @GetMapping("/list")
+    public Result<List<Resource>> list(Long facilityId) {
+        List<Resource> list = resourceService.list(facilityId);
+        return Result.success(list);
     }
     @PostMapping
     public Result add(@RequestBody Resource resource){

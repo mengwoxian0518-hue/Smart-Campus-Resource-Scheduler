@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.campus.mapper.FacilityMapper">
+    <select id="pageList" resultType="com.campus.vo.FacilityVO">
+        select f.*, c.name as category_name from facility as f left join category as c on f.category_id = c.id
+        <where>
+            <if test="name != null and name != ''">
+                and f.name like concat('%', #{name}, '%')
+            </if>
+            <if test="categoryId != null">
+                and f.category_id = #{categoryId}
+            </if>
+            <if test="status != null">
+                and f.status = #{status}
+            </if>
+        </where>
+    </select>
+   <insert id="add">
+       insert into facility(name,category_id,location,capacity,description,create_time,update_time,create_user,update_user,price) values(#{name},#{categoryId},#{location},#{capacity},#{description},#{createTime},#{updateTime},#{createUser},#{updateUser},#{price})
+   </insert>
+    <update id="update">
+        update facility set name = #{name},category_id = #{categoryId},location = #{location},capacity = #{capacity},description = #{description},update_time = #{updateTime},update_user = #{updateUser},price = #{price} where id = #{id}
+    </update>
+    <delete id="delete">
+        delete from facility where id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

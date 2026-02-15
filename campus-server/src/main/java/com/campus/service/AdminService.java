@@ -18,4 +18,6 @@ public interface AdminService {
     Staff getStaffById(Long id);
 
     void update(Staff staff);
+
+    void startOrStop(Integer status, Long id);
 }

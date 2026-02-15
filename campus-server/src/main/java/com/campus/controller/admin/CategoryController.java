@@ -25,6 +25,10 @@ public class CategoryController {
         {
             list = categoryService.list();
         }
+        else if (type==2)
+        {
+            list = categoryService.listFacility();
+        }
         return Result.success(list);
     }
 }

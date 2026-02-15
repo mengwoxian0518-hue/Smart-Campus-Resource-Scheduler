@@ -53,4 +53,10 @@ public class ResourceServiceImpl implements ResourceService {
     public void startOrStop(Integer status, Long id) {
         resourceMapper.startOrStop(status,id);
     }
+
+    @Override
+    public List<Resource> list(Long id) {
+        List<Resource> list = resourceMapper.list(id);
+        return list;
+    }
 }

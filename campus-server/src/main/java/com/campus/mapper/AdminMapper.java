@@ -27,4 +27,6 @@ public interface AdminMapper {
     @AutoFill(OperationType.UPDATE)
     @Update("update staff set name=#{name},sex=#{sex},job_title=#{jobTitle},hire_date=#{hireDate},phone=#{phone},username=#{username},update_time=#{updateTime} where id=#{id}")
     void update(Staff staff);
+    @Update("update staff set status= #{status} where id= #{id}")
+    void startOrStop(Integer status, Long id);
 }

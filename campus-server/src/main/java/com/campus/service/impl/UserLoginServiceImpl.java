@@ -43,8 +43,8 @@ public class UserLoginServiceImpl implements UserLoginService {
         {
             throw new RuntimeException("登录失败");
         }
-        User user=new User();
-        if(userLoginMapper.searchByOpenid(o)==null)
+        User user = userLoginMapper.searchByOpenid(o);
+        if(user==null)
         {
             user = User.builder().openid(o).createTime(LocalDateTime.now()).build();
             userLoginMapper.insertUser(user);

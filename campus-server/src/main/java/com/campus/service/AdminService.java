@@ -5,7 +5,7 @@ import com.campus.dto.AdminLoginDto;
 import com.campus.dto.StaffPageListDto;
 import com.campus.entity.Admin;
 import com.campus.entity.Staff;
-
+//Zmjjkk
 public interface AdminService {
     Admin login(AdminLoginDto adminLoginDto);
 

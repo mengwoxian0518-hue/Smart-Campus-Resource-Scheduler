@@ -36,4 +36,5 @@ public class UserQueryController {
         CategoryVO CategoryVO = userQueryService.getDetail(id,type);
         return Result.success(CategoryVO);
     }
+
 }

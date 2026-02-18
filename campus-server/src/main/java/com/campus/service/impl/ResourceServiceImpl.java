@@ -10,6 +10,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,19 +27,28 @@ public class ResourceServiceImpl implements ResourceService {
         Page<ResourceVO> resourceVOS = (Page<ResourceVO>)resourceMapper.pageList(resourcePageQueryDTO);
         return new PageResult<ResourceVO>(resourceVOS.getTotal(), resourceVOS.getResult());
     }
-
+    @Caching(evict = {
+            @CacheEvict(value = "getList",allEntries = true),
+            @CacheEvict(value = "getDetail",allEntries = true)
+    })
     @Override
     public void add(Resource resource) {
         resource.setStatus(1);
         resourceMapper.add(resource);
     }
-
+    @Caching(evict = {
+            @CacheEvict(value = "getList",allEntries = true),
+            @CacheEvict(value = "getDetail",allEntries = true)
+    })
     @Override
     public void update(Resource resource) {
         resource.setStatus(1);
         resourceMapper.update(resource);
     }
-
+    @Caching(evict = {
+            @CacheEvict(value = "getList",allEntries = true),
+            @CacheEvict(value = "getDetail",allEntries = true)
+    })
     @Override
     public void delete(List<Long> id) {
         resourceMapper.delete(id);
@@ -48,7 +59,10 @@ public class ResourceServiceImpl implements ResourceService {
         Resource byId = resourceMapper.getById(id);
         return byId;
     }
-
+    @Caching(evict = {
+            @CacheEvict(value = "getList",allEntries = true),
+            @CacheEvict(value = "getDetail",allEntries = true)
+    })
     @Override
     public void startOrStop(Integer status, Long id) {
         resourceMapper.startOrStop(status,id);

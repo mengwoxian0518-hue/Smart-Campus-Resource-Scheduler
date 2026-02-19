@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.campus.mapper.UserProfileMapper">
+    <update id="updateProfile">
+        update user
+        <set>
+        <if test="nickname != null">
+            nickname = #{nickname},
+        </if>
+        <if test="avatarUrl !=null">
+            avatar_url = #{avatarUrl},
+        </if>
+        <if test="studentId != null">
+            student_id = #{studentId},
+        </if>
+        <if test="realName != null">
+            real_name = #{realName},
+        </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="college != null">
+                 college = #{college},
+            </if>
+            <if test="major != null">
+                major = #{major},
+            </if>
+            <if test="className != null">
+                class_name = #{className},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

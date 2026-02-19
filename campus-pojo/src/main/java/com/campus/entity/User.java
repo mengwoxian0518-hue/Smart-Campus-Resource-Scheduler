@@ -28,4 +28,6 @@ public class User {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private LocalDateTime lastLoginTime;
+    private Integer creditScore;
+    private Integer creditStatus; // 0:良好 1:较差
 }

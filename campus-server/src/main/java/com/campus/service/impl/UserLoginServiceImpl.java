@@ -12,6 +12,7 @@ import com.campus.utils.HttpClientUtil;
 import com.campus.utils.JwtUtil;
 import com.campus.vo.UserLoginVO;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,10 +47,12 @@ public class UserLoginServiceImpl implements UserLoginService {
         User user = userLoginMapper.searchByOpenid(o);
         if(user==null)
         {
-            user = User.builder().openid(o).createTime(LocalDateTime.now()).build();
+            user = User.builder().openid(o).createTime(LocalDateTime.now()).lastLoginTime(LocalDateTime.now()).build();
             userLoginMapper.insertUser(user);
             isNewUser=true;
+            userLoginMapper.insertUserDetail(user.getId());
         }
+        userLoginMapper.uplateLoginTime(user.getId(),LocalDateTime.now());
         Map<String,Object> claims=new HashMap<>();
         claims.put("id",user.getId());
         String jwt = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);

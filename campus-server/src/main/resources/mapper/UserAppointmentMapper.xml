@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.campus.mapper.UserAppointmentMapper">
+    <insert id="insert">
+        insert into appointment(user_id,resource_id, type, appoint_date, start_time, end_time, status, create_time, update_time,reason )
+        values (#{userId},#{resourceId}, #{type}, #{appointDate}, #{startTime}, #{endTime}, #{status}, #{createTime},
+                #{updateTime},#{reason})
+    </insert>
+    <select id="listResource" resultType="Appointment">
+        select * from appointment
+        <where>
+            user_id=#{currentId} and type='RESOURCE'
+        <if test="status !=null">
+            and status=#{status}
+        </if>
+        </where>
+    </select>
+    <select id="listFacility" resultType="Appointment">
+        select * from appointment
+        <where>
+            user_id= #{currentId} and type='VENUE'
+        <if test="status !=null">
+            and status= #{status}
+        </if>
+        </where>
+    </select>
+</mapper>

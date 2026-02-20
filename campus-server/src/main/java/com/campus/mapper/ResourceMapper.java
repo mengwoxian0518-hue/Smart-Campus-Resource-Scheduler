@@ -27,6 +27,5 @@ public interface ResourceMapper {
     Resource getById(Long id);
     @Update("update resource set status=#{status} where id=#{id}")
     void startOrStop(Integer status, Long id);
-
     List<Resource> list(Long id);
 }

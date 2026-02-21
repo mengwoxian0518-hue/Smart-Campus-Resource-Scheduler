@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.campus.mapper.AdminAppointmentMapper">
+
+    <select id="page" resultType="com.campus.entity.Appointment">
+        SELECT
+        a.*,
+        CASE
+        WHEN a.type = 'RESOURCE' THEN r.name
+        WHEN a.type = 'VENUE' THEN f.name
+        END AS resourceName,
+        u.nickname AS userName
+        FROM appointment AS a
+        LEFT JOIN resource AS r ON a.type = 'RESOURCE' AND r.id = a.resource_id
+        LEFT JOIN facility AS f ON a.type = 'VENUE' AND f.id = a.resource_id
+        LEFT JOIN user AS u ON u.id = a.user_id
+        <where>
+            <if test="status != null">
+                AND a.status = #{status}
+            </if>
+            <if test="type != null and type != ''">
+                AND a.type = #{type}
+            </if>
+            <if test="beginDate != null">
+                AND a.appoint_date &gt;= #{beginDate}
+            </if>
+            <if test="endDate != null">
+                AND a.appoint_date &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY a.create_time DESC
+    </select>
+   <select id="detail" resultType="com.campus.vo.AdminAppointmentDetailVO">
+       select a.*,u.nickname as userName,u.student_id as studentId,
+       CASE
+        WHEN a.type = 'RESOURCE' THEN r.name
+        WHEN a.type = 'VENUE' THEN f.name
+        END AS resourceName,
+       r.image as image,
+       f.location as location
+       from appointment as a
+                left join user as u on a.user_id = u.id
+                LEFT JOIN resource AS r ON a.type = 'RESOURCE' AND r.id = a.resource_id
+                LEFT JOIN facility AS f ON a.type = 'VENUE' AND f.id = a.resource_id
+       where a.id=#{id}
+   </select>
+</mapper>

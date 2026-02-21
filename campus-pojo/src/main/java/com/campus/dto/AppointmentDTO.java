@@ -12,4 +12,5 @@ public class AppointmentDTO {
     private LocalTime startTime;
     private LocalTime endTime;
     private String reason;
+    private String rejectReason;
 }

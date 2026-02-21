@@ -30,8 +30,10 @@ public class Appointment {
     private LocalTime endTime;
     private String reason;
     private Integer status;
+    private String rejectReason;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime createTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime updateTime;
+    private String userName;
 }

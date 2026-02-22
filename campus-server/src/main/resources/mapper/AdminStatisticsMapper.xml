@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.campus.mapper.AdminStatisticsMapper">
+    <select id="appointmentCount" resultType="Integer">
+        select count(*)
+        from appointment
+        where appoint_date &lt;#{end} and appoint_date &gt;=#{start}
+    </select>
+    <select id="topResourceId" resultType="com.campus.vo.topResource">
+        select resource_id,type
+        from appointment
+        where appoint_date &lt;#{end} and appoint_date &gt;= #{start}
+        group by resource_id,type
+        order by sum(1) desc
+        limit 0,1
+    </select>
+    <select id="rankingList" resultType="com.campus.vo.RankingItemVO">
+        select case when a.type = 'RESOURCE' then r.name else f.name end as name,sum(1) as count
+        from appointment as a
+                 left join resource as r on a.resource_id = r.id and a.type = 'RESOURCE'
+                 left join facility as f on a.resource_id = f.id and a.type = 'VENUE'
+        where a.appoint_date &lt; #{end} and a.appoint_date &gt;= #{start}
+        group by a.resource_id,a.type
+        order by count desc
+        limit 0,5
+    </select>
+</mapper>

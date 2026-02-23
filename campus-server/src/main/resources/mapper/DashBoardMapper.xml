@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.campus.mapper.DashBoardMapper">
+    <select id="overviewPending" resultType="Integer">
+        select count(1)
+        from appointment where status=0
+    </select>
+    <select id="overviewTotalResources" resultType="Integer">
+        select (select count(1) from resource)+ (select count(1) from facility) as totalResources
+    </select>
+    <select id="overviewInUse" resultType="Integer">
+        select count(1) from appointment where status=1 and appoint_date=#{date} and #{now} between start_time and end_time
+    </select>
+    <select id="overviewUnderRepair" resultType="Integer">
+        select (select count(1) from resource where status = 0) + (select count(1) from facility where status = 0)
+    </select>
+    <select id="getResourceName" resultType="String">
+        <choose>
+            <when test="type == 'RESOURCE'">
+                select name from resource where id = #{resourceId}
+            </when>
+            <otherwise>
+                select name from facility where id = #{resourceId}
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

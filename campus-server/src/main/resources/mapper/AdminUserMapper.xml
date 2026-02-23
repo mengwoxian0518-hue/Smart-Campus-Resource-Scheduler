@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.campus.mapper.AdminUserMapper">
+    <select id="page" resultType="com.campus.vo.UserVO">
+        select u.*,ud.credit_score as creditScore from user as u left join user_detail as ud on u.id=ud.user_id
+        <where>
+            <if test="realName!=null">
+                u.real_name like concat('%',#{realName},'%')
+            </if>
+            <if test="studentId!=null">
+                and u.student_id like concat('%',#{studentId},'%')
+            </if>
+            <if test="creditStatus=='GOOD'">
+                and ud.credit_score &gt;= 60
+            </if>
+            <if test="creditStatus=='POOR'">
+                and ud.credit_score &lt; 60
+            </if>
+        </where>
+    </select>
+    <update id="updateCredit">
+        update user_detail set credit_score=case when #{action}='ADD' then credit_score+#{points} else credit_score-#{points} end
+        where user_id=#{userId}
+    </update>
+    <insert id="updateCreditStatus">
+        insert into credit_log(user_id,type,points,reason,create_time) values
+        (#{userId},#{type},#{points},#{reason},#{createTime})
+    </insert>
+</mapper>

@@ -16,10 +16,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class RankingItemVO implements Serializable {
     
-    // 资源或场地名称 (如："第一学术报告厅")
+    // 资源或场地名称
     private String name;
     
-    // 借用次数 (如：45)
+    // 借用次数
     private Integer count;
     
 }

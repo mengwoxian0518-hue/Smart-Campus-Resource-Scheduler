@@ -25,10 +25,6 @@ public class AppointmentTask {
 
     @Autowired
     private WebSocketServer webSocketServer;
-
-    /**
-     * cron = "0 * * * * ?" 表示每分钟的第0秒执行一次
-     */
     @Scheduled(cron = "0 * * * * ?")
     public void checkUrgentAppointments() {
         Integer countPending = appointmentMapper.getCountPending();

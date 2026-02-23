@@ -23,7 +23,7 @@ public class User {
     private String major;
     private String className;
     private String phone;
-    private String role; // 建议用枚举
+    private String role;
     private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

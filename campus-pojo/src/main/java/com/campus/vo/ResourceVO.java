@@ -18,9 +18,9 @@ public class ResourceVO implements Serializable {
     private Long id;
     private String name;
     private Long categoryId;
-    private String categoryName; // 🚀 冗余字段：显示类别名称
+    private String categoryName;
     private Long facilityId;
-    private String facilityName; // 🚀 冗余字段：显示场所名称
+    private String facilityName;
     private BigDecimal creditCost;
     private String image;
     private String model;

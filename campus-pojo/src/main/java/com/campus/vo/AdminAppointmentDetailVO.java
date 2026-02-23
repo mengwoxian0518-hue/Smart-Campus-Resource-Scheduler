@@ -43,8 +43,8 @@ public class AdminAppointmentDetailVO implements Serializable {
     private String userName;       // 申请人姓名/昵称
     private String studentId;      // 学号/工号
 
-    // 5. 租借物品/场地详细信息 (关联 facility/resource 表)
+    // 5. 租借物品/场地详细信息
     private String resourceName;   // 物资或场地名称
-    private String image;          // 物品图片 (如果是场地可为 null)
-    private String location;       // 具体位置 (如果是场地则返回，如"教学楼A-301")
+    private String image;          // 物品图片
+    private String location;       // 具体位置
 }

@@ -7,15 +7,15 @@ import java.time.LocalDate;
 
 @Data
 public class StaffPageListDto implements Serializable {
-    private String name;        // 姓名（模糊查询）
-    private String jobTitle;    // 职位/职责
+    private String name;
+    private String jobTitle;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate beginTime; // 入职开始时间
+    private LocalDate beginTime;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate endTime;   // 入职结束时间
+    private LocalDate endTime;
 
-    private int page=1;           // 页码
-    private int pageSize=10;       // 每页条数
+    private int page=1;
+    private int pageSize=10;
 }

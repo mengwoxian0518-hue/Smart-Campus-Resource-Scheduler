@@ -2,6 +2,7 @@ package com.campus.controller.admin;
 
 import com.campus.Result.PageResult;
 import com.campus.Result.Result;
+import com.campus.annotation.Log;
 import com.campus.dto.CreditChangeDTO;
 import com.campus.dto.UserPageQueryDTO;
 import com.campus.entity.User;
@@ -24,6 +25,7 @@ public class AdminUserController {
         return Result.success(page);
     }
     @PutMapping("/credit")
+    @Log(module = "用户管理", action = "修改信用分")
     public Result updateCredit(@RequestBody CreditChangeDTO creditChangeDTO)
     {
         adminUserService.updateCredit(creditChangeDTO);

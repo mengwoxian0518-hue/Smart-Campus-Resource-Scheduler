@@ -2,6 +2,7 @@ package com.campus.controller.admin;
 
 import com.campus.Result.PageResult;
 import com.campus.Result.Result;
+import com.campus.annotation.Log;
 import com.campus.dto.AllTypePageQueryDTO;
 import com.campus.dto.AppointmentAuditDTO;
 import com.campus.entity.Appointment;
@@ -24,6 +25,7 @@ public class AdminAppointmentController {
         return Result.success(page);
     }
     @PutMapping("/audit")
+    @Log(module = "预约审批", action = "审核预约申请")
     public Result audit(@RequestBody AppointmentAuditDTO appointmentAuditDTO){
         adminAppointmentService.audit(appointmentAuditDTO);
         return Result.success();

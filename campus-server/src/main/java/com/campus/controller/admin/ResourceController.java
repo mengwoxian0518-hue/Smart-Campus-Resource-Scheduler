@@ -2,6 +2,7 @@ package com.campus.controller.admin;
 
 import com.campus.Result.PageResult;
 import com.campus.Result.Result;
+import com.campus.annotation.Log;
 import com.campus.dto.ResourcePageQueryDTO;
 import com.campus.entity.Resource;
 import com.campus.service.ResourceService;
@@ -35,16 +36,19 @@ public class ResourceController {
         return Result.success(list);
     }
     @PostMapping
+    @Log(module = "资源管理", action = "增加资源")
     public Result add(@RequestBody Resource resource){
         resourceService.add(resource);
         return Result.success();
     }
     @PutMapping
+    @Log(module = "资源管理", action = "修改资源")
     public Result update(@RequestBody Resource resource){
         resourceService.update(resource);
         return Result.success();
     }
     @DeleteMapping
+    @Log(module = "资源管理", action = "删除资源")
     public Result delete(@RequestParam List<Long> ids){
         resourceService.delete(ids);
         return Result.success();
@@ -55,6 +59,7 @@ public class ResourceController {
         return Result.success(resource);
     }
     @PostMapping("/status/{status}")
+    @Log(module = "资源管理", action = "更改资源状态")
     public Result startOrStop(@PathVariable Integer status,Long id){
         resourceService.startOrStop(status,id);
         return Result.success();

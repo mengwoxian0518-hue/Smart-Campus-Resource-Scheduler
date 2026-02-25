@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 
+        提前定义控制台日志编码。
+        Spring Boot默认使用UTF-8，但这在Windows默认终端（GBK编码）下会导致乱码。
+        这里尝试使用系统默认编码（Windows下通常是GBK），如果获取不到则使用UTF-8。
+        这样可以兼容Windows CMD/PowerShell以及Linux/Docker环境。
+        注意：必须在引入defaults.xml之前定义，因为Logback属性一旦设置不可更改。
+    -->
+    <property name="CONSOLE_LOG_CHARSET" value="${file.encoding:-UTF-8}"/>
+
+    <!-- 引入Spring Boot默认的日志配置 -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    
+    <!-- 引入Spring Boot默认的控制台日志输出器 -->
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>

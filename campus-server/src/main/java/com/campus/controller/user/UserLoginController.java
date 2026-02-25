@@ -4,6 +4,8 @@ import com.campus.Result.Result;
 import com.campus.dto.CodeDto;
 import com.campus.service.UserLoginService;
 import com.campus.vo.UserLoginVO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequestMapping("/user/login")
+@Api(tags = "用户登录接口")
 public class UserLoginController {
     @Autowired
     UserLoginService userLoginService;
+    @ApiOperation("用户登录")
     @PostMapping
     public Result<UserLoginVO> login(@RequestBody CodeDto UserCode)
     {

@@ -20,12 +20,6 @@
             <if test="status != null">
                 and r.status = #{status}
             </if>
-            <if test="minPrice != null">
-                and r.credit_cost &gt;= #{minPrice}
-            </if>
-            <if test="maxPrice != null">
-                and r.credit_cost &lt;= #{maxPrice}
-            </if>
         </where>
         order by r.create_time desc
     </select>

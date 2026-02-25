@@ -16,6 +16,8 @@ import com.campus.service.AdminService;
 import com.campus.utils.JwtUtil;
 import com.campus.vo.AdminLoginVO;
 import com.campus.vo.SysLogExportVO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/admin")
 @Slf4j
+@Api(tags = "管理员接口")
 public class AdminController {
     @Autowired
     AdminService adminservice;
@@ -41,6 +44,7 @@ public class AdminController {
     JwtProperties jwtProperties;
     @Autowired
     SysLogMapper sysLogMapper;
+    @ApiOperation("管理员登录")
     @PostMapping("/login")
     public Result login(@RequestBody AdminLoginDto adminLoginDto) {
         Admin admin = adminservice.login(adminLoginDto);
@@ -60,18 +64,21 @@ public class AdminController {
                 .build();
       return Result.success(employeeLoginVO);
     }
+    @ApiOperation("员工列表")
     @GetMapping("staff/page")
     public Result listStaff(StaffPageListDto staffPageListDto)
     {
         PageResult<Staff> pageStaffList = adminservice.listStaff(staffPageListDto);
         return Result.success(pageStaffList);
     }
+    @ApiOperation("员工添加")
     @PostMapping("staff")
     @Log(module = "员工管理", action = "增加员工")
     public Result<Staff> addStaff(@RequestBody Staff staff)
     {adminservice.addStaff(staff);
         return Result.success() ;
     }
+    @ApiOperation("员工删除")
     @DeleteMapping("staff/{id}")
     @Log(module = "员工管理", action = "删除员工")
     public Result deleteStaff(@PathVariable Long id)
@@ -79,12 +86,14 @@ public class AdminController {
         adminservice.deleteStaff(id);
         return Result.success();
     }
+    @ApiOperation("员工查询")
     @GetMapping("staff/{id}")
     public Result<Staff> getStaffById(@PathVariable Long id)
     {
         Staff staff = adminservice.getStaffById(id);
         return Result.success(staff);
     }
+    @ApiOperation("员工修改")
     @PostMapping("staff/update")
     @Log(module = "员工管理", action = "修改员工")
     public Result update(@RequestBody Staff staff)
@@ -92,6 +101,7 @@ public class AdminController {
         adminservice.update(staff);
         return Result.success();
     }
+    @ApiOperation("员工状态修改")
     @PostMapping("staff/status/{status}")
     @Log(module = "员工管理", action = "更改员工状态")
     public Result startOrStop(@PathVariable Integer status,Long id)
@@ -99,6 +109,7 @@ public class AdminController {
         adminservice.startOrStop(status,id);
         return Result.success();
     }
+    @ApiOperation("日志导出")
     @GetMapping("/log/export")
     public void exportLog(@RequestParam("days") Integer days, HttpServletResponse response) throws IOException {
         LocalDate startDate = LocalDate.now().minusDays(days);

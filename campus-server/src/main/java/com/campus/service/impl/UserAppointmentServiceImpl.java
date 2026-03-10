@@ -11,8 +11,12 @@ import com.campus.mapper.UserAppointmentMapper;
 import com.campus.service.UserAppointmentService;
 import com.campus.vo.TimeSlotVO;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -31,6 +36,10 @@ public class UserAppointmentServiceImpl implements UserAppointmentService {
     ResourceMapper resourceMapper;
     @Autowired
     FacilityMapper facilityMapper;
+    @Autowired
+    RedissonClient redissonClient;
+    @Autowired
+    StringRedisTemplate redisTemplate;
     private static final LocalTime OPEN_TIME = LocalTime.of(8, 0);
     private static final LocalTime CLOSE_TIME = LocalTime.of(22, 0);
     private static final int STEP_MINUTES = 60;
@@ -88,25 +97,43 @@ public class UserAppointmentServiceImpl implements UserAppointmentService {
         return resultList;
     }
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void submitAppointment(AppointmentDTO dto) {
         //二次检查时间冲突
-        Integer count = userAppointmentMapper.countConflict(
-                dto.getResourceId(),
-                dto.getAppointDate(),
-                dto.getStartTime(),
-                dto.getEndTime()
-        );
-        if (count > 0) {
-            throw new RuntimeException("手慢了！该时间段刚刚已被抢占，请刷新后重试。");
+//        synchronized (this) {
+        String lockKey="lock:appointment:"+dto.getResourceId()+":"+dto.getAppointDate()+":"+dto.getStartTime()+":"+dto.getEndTime();
+        RLock lock = redissonClient.getLock(lockKey);
+        try{
+            if(lock.tryLock(5,10, TimeUnit.SECONDS))
+            {
+                try
+                {
+                    Integer count = userAppointmentMapper.countConflict(
+                            dto.getResourceId(),
+                            dto.getAppointDate(),
+                            dto.getStartTime(),
+                            dto.getEndTime()
+                    );
+                    if (count > 0) {
+                        throw new RuntimeException("手慢了！该时间段刚刚已被抢占，请刷新后重试。");
+                    }
+                    Appointment appointment = new Appointment();
+                    BeanUtils.copyProperties(dto, appointment);
+                    appointment.setUserId(BaseContext.getCurrentId());
+                    appointment.setStatus(0);
+                    appointment.setCreateTime(LocalDateTime.now());
+                    appointment.setUpdateTime(LocalDateTime.now());
+                    userAppointmentMapper.insert(appointment);
+                }finally {
+                    lock.unlock();
+                }
+            }else {
+                throw new RuntimeException("系统繁忙，请稍后再试");
+            }
+        }catch(InterruptedException e)
+        {
+            throw new RuntimeException("系统繁忙，请稍后再试");
         }
-        Appointment appointment = new Appointment();
-        BeanUtils.copyProperties(dto, appointment);
-        appointment.setUserId(BaseContext.getCurrentId());
-        appointment.setStatus(0);
-        appointment.setCreateTime(LocalDateTime.now());
-        appointment.setUpdateTime(LocalDateTime.now());
-        userAppointmentMapper.insert(appointment);
+//        }
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.campus.controller.user;
 
 import com.campus.Result.Result;
+import com.campus.annotation.RateLimit;
 import com.campus.dto.AppointmentDTO;
 import com.campus.entity.Appointment;
 import com.campus.service.UserAppointmentService;
@@ -24,6 +25,7 @@ public class UserAppointmentController {
     UserAppointmentService userAppointmentService;
     @ApiOperation("获取预约时间段")
     @GetMapping("/availability")
+    @RateLimit(key = "availability", time = 1, count = 5)
     public Result<List<TimeSlotVO>> getAvailability(Long resourceId, @DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate date, String type)
     {
         List<TimeSlotVO> timeSlotVO = userAppointmentService.getAvailability(resourceId,date,type);
@@ -31,6 +33,7 @@ public class UserAppointmentController {
     }
     @ApiOperation("提交预约")
     @PostMapping("submit")
+    @RateLimit(key = "submit", time = 1, count = 1)
     public Result submitAppointment(@RequestBody AppointmentDTO dto)
     {
         userAppointmentService.submitAppointment(dto);

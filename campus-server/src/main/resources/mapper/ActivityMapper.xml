@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.campus.mapper.ActivityMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into activity (
+            name, facility_id, start_time, end_time, signup_start_time, signup_end_time,
+            max_participants, current_participants, description, status, create_time, update_time
+        ) values (
+            #{name}, #{facilityId}, #{startTime}, #{endTime}, #{signupStartTime}, #{signupEndTime},
+            #{maxParticipants}, #{currentParticipants}, #{description}, #{status}, #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <select id="pageQuery" resultType="com.campus.vo.ActivityVO">
+        select a.*, f.name as facilityName, f.location
+        from activity a
+        left join facility f on a.facility_id = f.id
+        <where>
+            <if test="name != null and name != ''">
+                and a.name like concat('%', #{name}, '%')
+            </if>
+            <if test="status != null">
+                and a.status = #{status}
+            </if>
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <select id="getById" resultType="com.campus.vo.ActivityVO">
+        select a.*, f.name as facilityName, f.location
+        from activity a
+        left join facility f on a.facility_id = f.id
+        where a.id = #{id}
+    </select>
+
+    <update id="update">
+        update activity
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="facilityId != null">facility_id = #{facilityId},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="signupStartTime != null">signup_start_time = #{signupStartTime},</if>
+            <if test="signupEndTime != null">signup_end_time = #{signupEndTime},</if>
+            <if test="maxParticipants != null">max_participants = #{maxParticipants},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from activity where id = #{id}
+    </delete>
+
+    <update id="increaseParticipants">
+        update activity set current_participants = current_participants + 1 where id = #{id}
+    </update>
+    
+    <update id="decreaseStock">
+        update activity set current_participants = current_participants + 1 
+        where id = #{id} and current_participants &lt; max_participants
+    </update>
+
+    <select id="listMyActivities" resultType="com.campus.vo.ActivityVO">
+        select a.*, f.name as facilityName, f.location
+        from activity_signup s
+        inner join activity a on s.activity_id = a.id
+        left join facility f on a.facility_id = f.id
+        where s.user_id = #{userId}
+        order by s.signup_time desc
+    </select>
+
+</mapper>

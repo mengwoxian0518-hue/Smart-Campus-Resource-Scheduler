@@ -9,6 +9,7 @@ import com.campus.vo.StatisticsOverviewVO;
 import com.campus.vo.topResource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 public class AdminStatisticsServiceImpl implements AdminStatisticsService {
     @Autowired
     AdminStatisticsMapper adminStatisticsMapper;
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
     @Override
     public StatisticsOverviewVO overview(String days) {
         int count=Integer.parseInt(days);
@@ -32,7 +35,16 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
         List<Integer> trendValues=new ArrayList<>();
         LocalDate end=LocalDate.now();
         LocalDate start=end.minusDays(count);
-        List<RankingItemVO> rankingItemVOS = adminStatisticsMapper.rankingList(start, end);
+        Long cache = stringRedisTemplate.opsForZSet().size("overview:"+start+"-"+end);
+        if(cache==null)
+        {
+            List<RankingItemVO> rankingItemVOS = adminStatisticsMapper.rankingList(start, end);
+            for(int i=0;i<Math.min(rankingItemVOS.size(),5);i++)
+            {
+                stringRedisTemplate.opsForZSet().add("overview:"+start+"-"+end,rankingItemVOS.get(i).getName(),rankingItemVOS.get(i).getCount());
+            }
+        }
+        List<RankingItemVO> rankingItemVOS = stringRedisTemplate.opsForZSet().rangeWithScores("overview:"+start+"-"+end,0,4).stream().map(item->new RankingItemVO(item.getValue(),item.getScore().intValue())).collect(Collectors.toList());
         LocalDateTime startTime = LocalDateTime.of(start, LocalTime.MIN);
         LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MIN);
         Integer totalStudents=adminStatisticsMapper.totalStudents();

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
+import java.util.concurrent.TimeUnit;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,15 +37,16 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
         LocalDate end=LocalDate.now();
         LocalDate start=end.minusDays(count);
         Long cache = stringRedisTemplate.opsForZSet().size("overview:"+start+"-"+end);
-        if(cache==null)
+        if(cache==null||cache==0)
         {
             List<RankingItemVO> rankingItemVOS = adminStatisticsMapper.rankingList(start, end);
             for(int i=0;i<Math.min(rankingItemVOS.size(),5);i++)
             {
                 stringRedisTemplate.opsForZSet().add("overview:"+start+"-"+end,rankingItemVOS.get(i).getName(),rankingItemVOS.get(i).getCount());
+                stringRedisTemplate.expire("overview:"+start+"-"+end,1, TimeUnit.DAYS);
             }
         }
-        List<RankingItemVO> rankingItemVOS = stringRedisTemplate.opsForZSet().rangeWithScores("overview:"+start+"-"+end,0,4).stream().map(item->new RankingItemVO(item.getValue(),item.getScore().intValue())).collect(Collectors.toList());
+        List<RankingItemVO> rankingItemVOS = stringRedisTemplate.opsForZSet().reverseRangeWithScores("overview:"+start+"-"+end,0,4).stream().map(item->new RankingItemVO(item.getValue(),item.getScore().intValue())).collect(Collectors.toList());
         LocalDateTime startTime = LocalDateTime.of(start, LocalTime.MIN);
         LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MIN);
         Integer totalStudents=adminStatisticsMapper.totalStudents();
@@ -82,5 +84,6 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
                 .trendDates(dateS)
                 .trendValues(trendValues)
                 .rankingList(rankingItemVOS).build();
+
     }
 }

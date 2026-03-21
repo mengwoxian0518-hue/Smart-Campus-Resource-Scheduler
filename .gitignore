@@ -5,4 +5,5 @@
 *.class
 *Test.java
 *.yml
+*.md
 **/test/

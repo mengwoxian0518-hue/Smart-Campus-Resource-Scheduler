@@ -10,7 +10,10 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>campus-server</artifactId>
     <dependencies>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.campus</groupId>
             <artifactId>campus-common</artifactId>

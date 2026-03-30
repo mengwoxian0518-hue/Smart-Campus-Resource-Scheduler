@@ -1,6 +1,7 @@
 package com.campus.service.impl;
 
 import com.campus.Result.PageResult;
+import com.campus.config.ActivitySignupRabbitConfig;
 import com.campus.context.BaseContext;
 import com.campus.dto.ActivityPageQueryDTO;
 import com.campus.entity.ActivitySignup;
@@ -12,6 +13,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -36,10 +38,12 @@ public class UserActivityServiceImpl implements UserActivityService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     private static final String REDIS_KEY_ACTIVITY_STOCK = "activity:stock:";
     private static final String REDIS_KEY_ACTIVITY_SIGNUP_USERS = "activity:signup:users:";
     private static final String REDIS_KEY_ACTIVITY_DETAIL = "activity:detail:";
-    private static final String REDIS_KEY_ACTIVITY_SIGNUP_QUEUE = "queue.activity.signup";
     
     // Lua 脚本
     private DefaultRedisScript<Long> signupScript;
@@ -151,9 +155,13 @@ public class UserActivityServiceImpl implements UserActivityService {
 
         try {
             String payload = userId + ":" + id + ":" + System.currentTimeMillis();
-            redisTemplate.opsForList().rightPush(REDIS_KEY_ACTIVITY_SIGNUP_QUEUE, payload);
+            rabbitTemplate.convertAndSend(
+                    ActivitySignupRabbitConfig.ACTIVITY_SIGNUP_EXCHANGE,
+                    ActivitySignupRabbitConfig.ACTIVITY_SIGNUP_ROUTING_KEY,
+                    payload
+            );
         } catch (Exception e) {
-            log.error("Send stream message error: userId={}, activityId={}", userId, id, e);
+            log.error("Send rabbitmq message error: userId={}, activityId={}", userId, id, e);
             throw new RuntimeException("报名排队异常，请重试");
         }
     }

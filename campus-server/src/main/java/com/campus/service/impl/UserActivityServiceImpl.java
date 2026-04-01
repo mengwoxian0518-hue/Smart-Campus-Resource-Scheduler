@@ -13,6 +13,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -24,6 +26,7 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -47,12 +50,26 @@ public class UserActivityServiceImpl implements UserActivityService {
     
     // Lua 脚本
     private DefaultRedisScript<Long> signupScript;
+    private DefaultRedisScript<Long> signupRollbackScript;
 
     @PostConstruct
     public void init() {
         signupScript = new DefaultRedisScript<>();
         signupScript.setResultType(Long.class);
         signupScript.setScriptSource(new ResourceScriptSource(new ClassPathResource("lua/activity_signup.lua")));
+
+        signupRollbackScript = new DefaultRedisScript<>();
+        signupRollbackScript.setResultType(Long.class);
+        signupRollbackScript.setScriptText(
+                "local stockKey = KEYS[1]\n" +
+                        "local userSetKey = KEYS[2]\n" +
+                        "local userId = ARGV[1]\n" +
+                        "local removed = redis.call('SREM', userSetKey, userId)\n" +
+                        "if removed == 1 and redis.call('EXISTS', stockKey) == 1 then\n" +
+                        "  redis.call('INCR', stockKey)\n" +
+                        "end\n" +
+                        "return 1\n"
+        );
     }
 
     @Override
@@ -155,13 +172,23 @@ public class UserActivityServiceImpl implements UserActivityService {
 
         try {
             String payload = userId + ":" + id + ":" + System.currentTimeMillis();
+            CorrelationData correlationData = new CorrelationData(UUID.randomUUID().toString());
             rabbitTemplate.convertAndSend(
                     ActivitySignupRabbitConfig.ACTIVITY_SIGNUP_EXCHANGE,
                     ActivitySignupRabbitConfig.ACTIVITY_SIGNUP_ROUTING_KEY,
-                    payload
+                    payload,
+                    (MessagePostProcessor) message -> {
+                        message.getMessageProperties().setCorrelationId(correlationData.getId());
+                        return message;
+                    },
+                    correlationData
             );
         } catch (Exception e) {
-            log.error("Send rabbitmq message error: userId={}, activityId={}", userId, id, e);
+            redisTemplate.execute(signupRollbackScript,
+                    java.util.Arrays.asList(stockKey, userSetKey),
+                    userId.toString()
+            );
+            log.error("信息错误: userId={}, activityId={}", userId, id, e);
             throw new RuntimeException("报名排队异常，请重试");
         }
     }
